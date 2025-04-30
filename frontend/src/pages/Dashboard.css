@@ -1,0 +1,51 @@
+.dashboard {
+    padding: 30px;
+  }
+  
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .top-bar button,
+  .top-bar input {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .top-bar input {
+    flex-grow: 1;
+    max-width: 200px;
+    outline: none;
+  }
+  
+  .top-bar button {
+    background-color: #2e7d32;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .top-bar button:hover {
+    background-color: #256c27;
+  }
+  
+  h2 {
+    margin-bottom: 15px;
+    color: #0a5606;
+  }
+  .welcome-text {
+    margin-right: auto;
+    font-weight: bold;
+    color: white;
+  }
+
+  .welcome-text {
+    margin-right: auto;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #2e7d32;
+  }
