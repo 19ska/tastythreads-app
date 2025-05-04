@@ -4,10 +4,10 @@ import "./Dashboard.css";
 import RestaurantCard from "../components/RestaurantCard";
 import TabMenu from "../components/TabMenu";
 import "./Dashboard.css";
-import dummyRestaurants from "../data/DummyRestaurants";
-
 
 const Dashboard = () => {
+  const [restaurants, setRestaurants] = useState([]);
+
   const [userEmail, setUserEmail] = useState("");
   const [selectedTab, setSelectedTab] = useState("Recommended");
   const navigate = useNavigate();
@@ -26,11 +26,16 @@ const Dashboard = () => {
     } catch {
       navigate("/login");
     }
+
+    //Fetch restaurants
+    fetch("http://localhost:4000/api/restaurants")
+      .then((res) => res.json())
+      .then((data) => setRestaurants(data))
+      .catch((err) => console.error("Failed to fetch restaurants", err));
+
   }, [navigate]);
 
-  const filtered = dummyRestaurants.filter(
-    (r) => selectedTab === "Recommended" || r.category === selectedTab
-  );
+  const filtered = restaurants;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -41,7 +46,7 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className="top-bar">
         <span className="welcome-text">Welcome, {userEmail}</span>
-        <button>Add Restaurant</button>
+        <button onClick={() => navigate("/add-restaurant")}>Add Restaurant</button>
         <input placeholder="Search..." />
         <button onClick={handleLogout}>Logout</button>
       </div>
@@ -52,10 +57,10 @@ const Dashboard = () => {
       <div className="card-grid">
         {filtered.map((r) => (
           <RestaurantCard
-            key={r.id}
+            key={r._id}  // use MongoDB ID
             name={r.name}
-            image={r.image}
-            description={r.description}
+            image={r.menuPhotos[0]}  // or a default image if empty
+            description={r.overview}
           />
         ))}
       </div>
