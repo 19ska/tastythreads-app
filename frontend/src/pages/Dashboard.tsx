@@ -59,7 +59,7 @@ const Dashboard = () => {
           <RestaurantCard
             key={r._id}  // use MongoDB ID
             name={r.name}
-            image={r.menuPhotos[0]}  // or a default image if empty
+            image={r.menuPhotos && r.menuPhotos.length > 0 ? r.menuPhotos[0] : undefined}
             description={r.overview}
           />
         ))}

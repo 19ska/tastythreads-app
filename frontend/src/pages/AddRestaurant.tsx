@@ -34,21 +34,21 @@ const AddRestaurant = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const submitData = new FormData();
-    submitData.append('name', formData.name);
-    submitData.append('overview', formData.overview);
-    submitData.append('location', formData.location);
-    submitData.append('priceRange', formData.priceRange);
-    submitData.append('cuisine', formData.cuisine);
+    const uploadData = new FormData();
+    uploadData.append('name', formData.name);
+    uploadData.append('overview', formData.overview);
+    uploadData.append('location', formData.location);
+    uploadData.append('priceRange', formData.priceRange);
+    uploadData.append('cuisine', formData.cuisine);
 
     formData.menuPhotos.forEach((file) => {
-        submitData.append('menuPhotos', file);
+        uploadData.append('menuPhotos', file);
     });
   
     try {
       const response = await fetch('http://localhost:4000/api/restaurants/add-restaurant', {
         method: 'POST',
-        body: formData,
+        body: uploadData,
       });
   
       if (response.ok) {
