@@ -1,0 +1,39 @@
+.add-restaurant-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .restaurant-form input,
+  .restaurant-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .restaurant-form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .restaurant-form button:hover {
+    background-color: #45a049;
+  }
+
+  ul {
+    background: white;
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+  }
+  
+  li:hover {
+    background: #f0f0f0;
+  }
+  
+  
