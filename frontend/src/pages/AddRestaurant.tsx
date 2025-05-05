@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import debounce from "lodash.debounce";
 import "./AddRestaurant.css";
 
 const AddRestaurant = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
-  }, [navigate]);
-
   const [formData, setFormData] = useState({
     name: "",
     overview: "",
@@ -21,65 +14,134 @@ const AddRestaurant = () => {
     cuisine: ""
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "location") {
+      fetchLocations(value);
+    }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fetchLocations = debounce(async (query) => {
+    if (!query) {
+      setLocationSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json`);
+      const data = await res.json();
+      setLocationSuggestions(data);
+    } catch (err) {
+      console.error("Failed to fetch locations", err);
+    }
+  }, 500); // debounce 500ms
+
+  const handleFileChange = (e) => {
     if (e.target.files) {
       setFormData({ ...formData, menuPhotos: Array.from(e.target.files) });
     }
   };
 
+  const handleSelectSuggestion = (place) => {
+    setFormData({ ...formData, location: place.display_name });
+    setLocationSuggestions([]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const uploadData = new FormData();
-    uploadData.append('name', formData.name);
-    uploadData.append('overview', formData.overview);
-    uploadData.append('location', formData.location);
-    uploadData.append('priceRange', formData.priceRange);
-    uploadData.append('cuisine', formData.cuisine);
-
+    const formDataObj = new FormData();
+    formDataObj.append("name", formData.name);
+    formDataObj.append("overview", formData.overview);
+    formDataObj.append("location", formData.location);
+    formDataObj.append("priceRange", formData.priceRange);
+    formDataObj.append("cuisine", formData.cuisine);
     formData.menuPhotos.forEach((file) => {
-        uploadData.append('menuPhotos', file);
+      formDataObj.append("menuPhotos", file);
     });
-  
+
     try {
-      const response = await fetch('http://localhost:4000/api/restaurants/add-restaurant', {
-        method: 'POST',
-        body: uploadData,
+      const response = await fetch("http://localhost:4000/api/restaurants/add-restaurant", {
+        method: "POST",
+        body: formDataObj,
       });
-  
+
       if (response.ok) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
-        alert('Failed to add restaurant');
+        alert("Failed to add restaurant");
       }
     } catch (error) {
-      alert('Error: ' + error.message);
+      alert("Error: " + error.message);
     }
   };
-  
 
   return (
     <div className="add-restaurant-container">
       <h2>Add Restaurant</h2>
       <form className="restaurant-form" onSubmit={handleSubmit}>
         <input name="name" value={formData.name} onChange={handleChange} placeholder="Enter name" />
-
         <textarea name="overview" value={formData.overview} onChange={handleChange} placeholder="Enter overview" rows={4} />
-
         <input type="file" name="menuPhotos" multiple onChange={handleFileChange} />
 
-        <input name="location" value={formData.location} onChange={handleChange} placeholder="Enter location" />
+        {/* <=== wrap location input + dropdown here ===> */}
+        <div style={{ position: "relative", width: "100%" }}>
+          <input
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            placeholder="Enter location"
+            style={{ width: "100%" }}
+          />
+
+          {locationSuggestions.length > 0 && (
+            <ul
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                right: 0,
+                background: "white",
+                border: "1px solid #ccc",
+                maxHeight: "150px",
+                overflowY: "auto",
+                zIndex: 1000,
+                margin: 0,
+                padding: 0,
+                listStyle: "none"
+              }}
+            >
+              {locationSuggestions.map((place) => (
+                <li
+                  key={place.place_id}
+                  onClick={() => handleSelectSuggestion(place)}
+                  style={{
+                    cursor: "pointer",
+                    padding: "8px",
+                    borderBottom: "1px solid #eee"
+                  }}
+                >
+                  {place.display_name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <input name="priceRange" value={formData.priceRange} onChange={handleChange} placeholder="Enter price range" />
-
         <input name="cuisine" value={formData.cuisine} onChange={handleChange} placeholder="Enter cuisine" />
-
         <button type="submit">Add Restaurant</button>
       </form>
+
     </div>
   );
 };

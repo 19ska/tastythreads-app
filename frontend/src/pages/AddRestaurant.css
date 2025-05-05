@@ -24,4 +24,16 @@
   .restaurant-form button:hover {
     background-color: #45a049;
   }
+
+  ul {
+    background: white;
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+  }
+  
+  li:hover {
+    background: #f0f0f0;
+  }
+  
   
