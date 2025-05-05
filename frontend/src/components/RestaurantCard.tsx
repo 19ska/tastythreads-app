@@ -1,13 +1,16 @@
+import { Link } from "react-router-dom";
 import "./RestaurantCard.css";
 
 type Props = {
-    name: string;
-    image: string;
-    description: string;
-  };
-  
-  const RestaurantCard = ({ name, image, description }: Props) => {
-    return (
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+};
+
+const RestaurantCard = ({ _id, name, image, description }: Props) => {
+  return (
+    <Link to={`/restaurants/${_id}`} style={{ textDecoration: "none", color: "inherit" }}>
       <div className="card">
         <img src={image} alt={name} className="card-img" />
         <div className="card-body">
@@ -15,7 +18,8 @@ type Props = {
           <p>{description}</p>
         </div>
       </div>
-    );
-  };
-  
-  export default RestaurantCard;
+    </Link>
+  );
+};
+
+export default RestaurantCard;

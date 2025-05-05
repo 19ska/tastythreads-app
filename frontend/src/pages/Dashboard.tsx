@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Dashboard.css";
 import RestaurantCard from "../components/RestaurantCard";
-import TabMenu from "../components/TabMenu";
 import "./Dashboard.css";
-import dummyRestaurants from "../data/DummyRestaurants";
 
+type Restaurant = {
+  _id: string;
+  name: string;
+  menuPhotos: string[];
+  overview: string;
+  // Add other fields if needed
+};
 
 const Dashboard = () => {
-  const [userEmail, setUserEmail] = useState("");
-  const [selectedTab, setSelectedTab] = useState("Recommended");
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [userEmail, setUserEmail] = useState("User");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,15 +26,23 @@ const Dashboard = () => {
 
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      setUserEmail(payload.email || "User");
+      if (payload.email) setUserEmail(payload.email);
     } catch {
       navigate("/login");
     }
-  }, [navigate]);
 
-  const filtered = dummyRestaurants.filter(
-    (r) => selectedTab === "Recommended" || r.category === selectedTab
-  );
+    fetch("http://localhost:4000/api/restaurants")
+      .then((res) => res.json())
+      .then((data) => {
+        const validRestaurants = Array.isArray(data)
+          ? data.filter(r => r._id && r.name)
+          : [];
+        setRestaurants(validRestaurants);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch restaurants", err);
+      });
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -41,21 +53,20 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className="top-bar">
         <span className="welcome-text">Welcome, {userEmail}</span>
-        <button>Add Restaurant</button>
+        <button onClick={() => navigate("/add-restaurant")}>Add Restaurant</button>
         <input placeholder="Search..." />
         <button onClick={handleLogout}>Logout</button>
       </div>
 
-      <h2>Browse restaurants </h2>
-      <TabMenu selected={selectedTab} setSelected={setSelectedTab} />
-
+      <h2>Browse Restaurants</h2>
       <div className="card-grid">
-        {filtered.map((r) => (
+        {restaurants.map((r) => (
           <RestaurantCard
-            key={r.id}
+            key={r._id}
+            _id={r._id}
             name={r.name}
-            image={r.image}
-            description={r.description}
+            image={r.menuPhotos?.[0] || "/placeholder.jpg"}  // fallback image
+            description={r.overview || "No description available."}
           />
         ))}
       </div>
