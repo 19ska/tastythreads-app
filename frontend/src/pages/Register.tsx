@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Register.css";
 import debounce from "lodash.debounce";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -28,7 +31,9 @@ const Register = () => {
       return;
     }
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json`);
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${query}&format=json`
+      );
       const data = await res.json();
       setLocationSuggestions(data);
     } catch (err) {
@@ -41,10 +46,30 @@ const Register = () => {
     setLocationSuggestions([]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Registering:", formData);
-    // connect to backend here
+
+    try {
+      const res = await fetch("http://localhost:4000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Registration successful!");
+        navigate("/login"); // ✅ Redirect here
+      } else {
+        alert(`❌ Registration failed: ${data.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("❌ Could not connect to server.");
+    }
   };
 
   return (
@@ -73,7 +98,7 @@ const Register = () => {
             onChange={handleChange}
             required
           />
-          
+
           {/* Location input + suggestions */}
           <div style={{ position: "relative", width: "100%" }}>
             <input
@@ -117,7 +142,7 @@ const Register = () => {
               </ul>
             )}
           </div>
-          
+
           <input
             type="password"
             name="password"
