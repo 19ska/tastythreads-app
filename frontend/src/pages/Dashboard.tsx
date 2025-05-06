@@ -4,8 +4,15 @@ import "./Dashboard.css";
 import RestaurantCard from "../components/RestaurantCard";
 import TabMenu from "../components/TabMenu";
 
+type Restaurant = {
+  _id: string;
+  name: string;
+  menuPhotos: string[];
+  overview: string;
+};
+
 const Dashboard = () => {
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [selectedTab, setSelectedTab] = useState("Recommended");

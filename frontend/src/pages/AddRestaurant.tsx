@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import "./AddRestaurant.css";
@@ -8,7 +8,7 @@ const AddRestaurant = () => {
   const [formData, setFormData] = useState({
     name: "",
     overview: "",
-    menuPhotos: [],
+    menuPhotos: [] as File[],
     location: "",
     priceRange: "",
     cuisine: "",
@@ -16,7 +16,7 @@ const AddRestaurant = () => {
     lon: ""
   });
 
-  const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -25,7 +25,7 @@ const AddRestaurant = () => {
     }
   }, [navigate]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
@@ -48,13 +48,13 @@ const AddRestaurant = () => {
     }
   }, 500);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFormData({ ...formData, menuPhotos: Array.from(e.target.files) });
     }
   };
 
-  const handleSelectSuggestion = (place) => {
+  const handleSelectSuggestion = (place: any) => {
     setFormData({
       ...formData,
       location: place.display_name,
@@ -64,7 +64,7 @@ const AddRestaurant = () => {
     setLocationSuggestions([]);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formDataObj = new FormData();
     formDataObj.append("name", formData.name);
@@ -89,7 +89,7 @@ const AddRestaurant = () => {
       } else {
         alert("Failed to add restaurant");
       }
-    } catch (error) {
+    } catch (error: any) {
       alert("Error: " + error.message);
     }
   };
