@@ -61,6 +61,8 @@ const Register = () => {
       const data = await res.json();
 
       if (res.ok) {
+        localStorage.setItem("userId", data.user._id);
+        localStorage.setItem("username", data.user.fullName);
         alert("✅ Registration successful!");
         navigate("/login"); // ✅ Redirect here
       } else {

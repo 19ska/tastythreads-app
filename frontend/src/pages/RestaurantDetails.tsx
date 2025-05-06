@@ -11,12 +11,14 @@ interface Reply {
   _id: string;
   reply: string;
   user: string;
+  userId?: string;
 }
 
 interface ThreadItem {
   _id: string;
   post: string;
   user: string;
+  userId?: string;
   imageUrl?: string;
   replies: Reply[];
 }
@@ -38,10 +40,14 @@ const RestaurantDetails = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [post, setPost] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [threads, setThreads] = useState<ThreadItem[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const username = localStorage.getItem("username") || "Anonymous";
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const userId = localStorage.getItem("userId") || "";
 
   const fetchThreads = () => {
     if (!id) return;
@@ -69,6 +75,7 @@ const RestaurantDetails = () => {
     const formData = new FormData();
     formData.append("post", post);
     formData.append("user", username);
+    formData.append("userId", userId);
     if (image) formData.append("image", image);
 
     fetch(`http://localhost:4000/api/restaurants/${id}/threads`, {
@@ -82,6 +89,7 @@ const RestaurantDetails = () => {
       .then(() => {
         setPost("");
         setImage(null);
+        setImagePreview(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
         fetchThreads();
       })
@@ -94,7 +102,7 @@ const RestaurantDetails = () => {
     fetch(`http://localhost:4000/api/restaurants/${id}/threads/${threadId}/replies`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reply, user: username }),
+      body: JSON.stringify({ reply, user: username, userId }),
     })
       .then((res) => res.json())
       .then(() => fetchThreads())
@@ -131,28 +139,37 @@ const RestaurantDetails = () => {
 
           <div style={{ marginBottom: "1rem" }}>
             <input
-              ref={fileInputRef}
               type="file"
               accept="image/*"
+              ref={fileInputRef}
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) setImage(file);
+                if (file) {
+                  setImage(file);
+                  setImagePreview(URL.createObjectURL(file));
+                } else {
+                  setImage(null);
+                  setImagePreview(null);
+                }
               }}
               style={{ display: "block", marginBottom: "0.5rem" }}
             />
 
-            {image && (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span>{image.name}</span>
-                <button
-                  onClick={() => {
-                    setImage(null);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                  style={{ marginLeft: "1rem", padding: "4px 8px", backgroundColor: "#e74c3c", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                >
-                  Cancel Upload
-                </button>
+            {imagePreview && (
+              <div style={{ marginBottom: "0.5rem" }}>
+                <img src={imagePreview} alt="preview" style={{ maxWidth: "100%", maxHeight: 200, borderRadius: 6 }} />
+                <div style={{ marginTop: "0.5rem" }}>
+                  <button
+                    onClick={() => {
+                      setImage(null);
+                      setImagePreview(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    style={{ backgroundColor: "#d9534f", color: "white", padding: "6px 12px", border: "none", borderRadius: 4, cursor: "pointer" }}
+                  >
+                    Cancel Upload
+                  </button>
+                </div>
               </div>
             )}
 
@@ -176,7 +193,7 @@ const RestaurantDetails = () => {
 
           {threads.map((t) => (
             <div key={t._id} style={{ backgroundColor: "#2d2d2d", color: "white", padding: "15px", borderRadius: "6px", marginBottom: "1rem", textAlign: "left" }}>
-              <strong>{t.post}</strong> — <em>{t.user}</em>
+              <strong>{t.post}</strong> — <em>{t.userId === userId ? "You" : "Anonymous"}</em>
               {t.imageUrl && (
                 <div style={{ marginTop: 10 }}>
                   <img src={t.imageUrl} alt="thread" style={{ maxWidth: "100%", borderRadius: "8px" }} />
@@ -185,7 +202,7 @@ const RestaurantDetails = () => {
               <div style={{ marginTop: "10px" }}>
                 {t.replies.map((r) => (
                   <div key={r._id} style={{ marginLeft: 20, marginTop: 6 }}>
-                    ↳ {r.reply} — {r.user}
+                    ↳ {r.reply} — <em>{r.userId === userId ? "You" : "Anonymous"}</em>
                   </div>
                 ))}
               </div>
