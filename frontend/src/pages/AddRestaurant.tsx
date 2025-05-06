@@ -11,7 +11,9 @@ const AddRestaurant = () => {
     menuPhotos: [],
     location: "",
     priceRange: "",
-    cuisine: ""
+    cuisine: "",
+    lat: "",
+    lon: ""
   });
 
   const [locationSuggestions, setLocationSuggestions] = useState([]);
@@ -44,7 +46,7 @@ const AddRestaurant = () => {
     } catch (err) {
       console.error("Failed to fetch locations", err);
     }
-  }, 500); // debounce 500ms
+  }, 500);
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -53,7 +55,12 @@ const AddRestaurant = () => {
   };
 
   const handleSelectSuggestion = (place) => {
-    setFormData({ ...formData, location: place.display_name });
+    setFormData({
+      ...formData,
+      location: place.display_name,
+      lat: place.lat,
+      lon: place.lon
+    });
     setLocationSuggestions([]);
   };
 
@@ -65,6 +72,8 @@ const AddRestaurant = () => {
     formDataObj.append("location", formData.location);
     formDataObj.append("priceRange", formData.priceRange);
     formDataObj.append("cuisine", formData.cuisine);
+    formDataObj.append("lat", formData.lat);
+    formDataObj.append("lon", formData.lon);
     formData.menuPhotos.forEach((file) => {
       formDataObj.append("menuPhotos", file);
     });
@@ -93,7 +102,6 @@ const AddRestaurant = () => {
         <textarea name="overview" value={formData.overview} onChange={handleChange} placeholder="Enter overview" rows={4} />
         <input type="file" name="menuPhotos" multiple onChange={handleFileChange} />
 
-        {/* <=== wrap location input + dropdown here ===> */}
         <div style={{ position: "relative", width: "100%" }}>
           <input
             name="location"
@@ -141,7 +149,6 @@ const AddRestaurant = () => {
         <input name="cuisine" value={formData.cuisine} onChange={handleChange} placeholder="Enter cuisine" />
         <button type="submit">Add Restaurant</button>
       </form>
-
     </div>
   );
 };

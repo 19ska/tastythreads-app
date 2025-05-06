@@ -3,42 +3,79 @@ import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import RestaurantCard from "../components/RestaurantCard";
 import TabMenu from "../components/TabMenu";
-import "./Dashboard.css";
 
 const Dashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
-
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [selectedTab, setSelectedTab] = useState("Recommended");
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
+  
     if (!token) {
       navigate("/login");
       return;
     }
-
+  
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       setUserEmail(payload.email || "User");
     } catch {
       navigate("/login");
     }
+  
+    const savedLocation = localStorage.getItem("userLocation");
+    let url = "http://localhost:4000/api/restaurants";
 
-    //Fetch restaurants
-    fetch("http://localhost:4000/api/restaurants")
+    if (savedLocation) {
+      const parsed = JSON.parse(savedLocation);
+      url += `?lat=${parsed.latitude}&lon=${parsed.longitude}`;
+      setUserLocation(parsed);
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const loc = { latitude, longitude };
+          localStorage.setItem("userLocation", JSON.stringify(loc));
+          setUserLocation(loc);
+          url += `?lat=${latitude}&lon=${longitude}`;
+
+          fetch(url)
+            .then((res) => res.json())
+            .then((data) => setRestaurants(data))
+            .catch((err) => console.error("Failed to fetch restaurants", err));
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+        }
+      );
+      return; // exit early; fetch happens inside geolocation success
+    }
+
+    // fetch if location already saved
+    fetch(url)
       .then((res) => res.json())
       .then((data) => setRestaurants(data))
       .catch((err) => console.error("Failed to fetch restaurants", err));
-
   }, [navigate]);
-
-  const filtered = restaurants;
+  
+  useEffect(() => {
+    let url = "http://localhost:4000/api/restaurants";
+    if (userLocation) {
+      url += `?lat=${userLocation.latitude}&lon=${userLocation.longitude}`;
+    }
+  
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => setRestaurants(data))
+      .catch((err) => console.error("Failed to fetch restaurants", err));
+  }, [userLocation]);  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userLocation");
     navigate("/login");
   };
 
@@ -52,12 +89,12 @@ const Dashboard = () => {
       </div>
 
       <h2>Browse restaurants </h2>
-      <TabMenu selected={selectedTab} setSelected={setSelectedTab} />
+      <TabMenu selected={selectedTab} setSelectedTab={setSelectedTab} />
 
       <div className="card-grid">
-        {filtered.map((r) => (
+        {restaurants.map((r) => (
           <RestaurantCard
-            key={r._id}  // use MongoDB ID
+            key={r._id}
             name={r.name}
             image={r.menuPhotos && r.menuPhotos.length > 0 ? r.menuPhotos[0] : undefined}
             description={r.overview}

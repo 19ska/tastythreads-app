@@ -6,4 +6,5 @@ const upload = require('../middlewares/upload');
 router.get('/', getRestaurants);
 router.post('/add-restaurant', upload.array('menuPhotos'), addRestaurant);
 
+
 module.exports = router;
