@@ -1,0 +1,50 @@
+/* .discussion-tab-menu {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .discussion-tab-menu button {
+    background: transparent;
+    color: #2e7d32;
+    padding: 8px 16px;
+    border: 2px solid #2e7d32;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-weight: 500;
+  }
+  
+  .discussion-tab-menu button.active {
+    background-color: #2e7d32;
+    color: white;
+  } */
+
+
+  .discussion-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+  
+  .tab-section {
+    padding: 16px;
+    overflow-y: auto;
+    height: 100%;
+  }
+  
+  .overview {
+    width: 20%;
+    border-right: 1px solid #ddd;
+  }
+  
+  .discussion {
+    width: 60%;
+    border-right: 1px solid #ddd;
+  }
+  
+  .menu {
+    width: 20%;
+  }
+  

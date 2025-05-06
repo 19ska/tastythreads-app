@@ -9,6 +9,10 @@ type Restaurant = {
   name: string;
   menuPhotos: string[];
   overview: string;
+<<<<<<< HEAD
+=======
+  // Add other fields if needed
+>>>>>>> e12a824 (discussion)
 };
 
 const Dashboard = () => {
@@ -51,7 +55,12 @@ const Dashboard = () => {
 
           fetch(url)
             .then((res) => res.json())
-            .then((data) => setRestaurants(data))
+            .then((data) => {
+              const validRestaurants = Array.isArray(data)
+                ? data.filter(r => r._id && r.name)
+                : [];
+              setRestaurants(validRestaurants);
+            })
             .catch((err) => console.error("Failed to fetch restaurants", err));
         },
         (error) => {
@@ -64,7 +73,12 @@ const Dashboard = () => {
     // fetch if location already saved
     fetch(url)
       .then((res) => res.json())
-      .then((data) => setRestaurants(data))
+      .then((data) => {
+        const validRestaurants = Array.isArray(data)
+          ? data.filter(r => r._id && r.name)
+          : [];
+        setRestaurants(validRestaurants);
+      })
       .catch((err) => console.error("Failed to fetch restaurants", err));
   }, [navigate]);
   
@@ -76,7 +90,12 @@ const Dashboard = () => {
   
     fetch(url)
       .then((res) => res.json())
-      .then((data) => setRestaurants(data))
+      .then((data) => {
+        const validRestaurants = Array.isArray(data)
+          ? data.filter(r => r._id && r.name)
+          : [];
+        setRestaurants(validRestaurants);
+      })
       .catch((err) => console.error("Failed to fetch restaurants", err));
   }, [userLocation]);  
 
@@ -102,9 +121,10 @@ const Dashboard = () => {
         {restaurants.map((r) => (
           <RestaurantCard
             key={r._id}
+            _id={r._id}
             name={r.name}
-            image={r.menuPhotos && r.menuPhotos.length > 0 ? r.menuPhotos[0] : undefined}
-            description={r.overview}
+            image={r.menuPhotos && r.menuPhotos.length > 0 ? r.menuPhotos[0] : "/placeholder.jpg"}
+            description={r.overview || "No description available"}
           />
         ))}
       </div>
