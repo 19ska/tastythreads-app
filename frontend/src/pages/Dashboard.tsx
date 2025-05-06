@@ -9,10 +9,7 @@ type Restaurant = {
   name: string;
   menuPhotos: string[];
   overview: string;
-<<<<<<< HEAD
-=======
   // Add other fields if needed
->>>>>>> e12a824 (discussion)
 };
 
 const Dashboard = () => {
@@ -24,19 +21,19 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-  
+
     if (!token) {
       navigate("/login");
       return;
     }
-  
+
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       setUserEmail(payload.email || "User");
     } catch {
       navigate("/login");
     }
-  
+
     const savedLocation = localStorage.getItem("userLocation");
     let url = "http://localhost:4000/api/restaurants";
 
@@ -57,7 +54,7 @@ const Dashboard = () => {
             .then((res) => res.json())
             .then((data) => {
               const validRestaurants = Array.isArray(data)
-                ? data.filter(r => r._id && r.name)
+                ? data.filter((r) => r._id && r.name)
                 : [];
               setRestaurants(validRestaurants);
             })
@@ -67,37 +64,36 @@ const Dashboard = () => {
           console.error("Error getting user location:", error);
         }
       );
-      return; // exit early; fetch happens inside geolocation success
+      return;
     }
 
-    // fetch if location already saved
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
         const validRestaurants = Array.isArray(data)
-          ? data.filter(r => r._id && r.name)
+          ? data.filter((r) => r._id && r.name)
           : [];
         setRestaurants(validRestaurants);
       })
       .catch((err) => console.error("Failed to fetch restaurants", err));
   }, [navigate]);
-  
+
   useEffect(() => {
     let url = "http://localhost:4000/api/restaurants";
     if (userLocation) {
       url += `?lat=${userLocation.latitude}&lon=${userLocation.longitude}`;
     }
-  
+
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
         const validRestaurants = Array.isArray(data)
-          ? data.filter(r => r._id && r.name)
+          ? data.filter((r) => r._id && r.name)
           : [];
         setRestaurants(validRestaurants);
       })
       .catch((err) => console.error("Failed to fetch restaurants", err));
-  }, [userLocation]);  
+  }, [userLocation]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -114,7 +110,7 @@ const Dashboard = () => {
         <button onClick={handleLogout}>Logout</button>
       </div>
 
-      <h2>Browse restaurants </h2>
+      <h2>Browse restaurants</h2>
       <TabMenu selected={selectedTab} setSelectedTab={setSelectedTab} />
 
       <div className="card-grid">
