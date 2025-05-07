@@ -2,15 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const awsServerlessExpress = require('aws-serverless-express');
+
 const restaurantRoutes = require('./routes/restaurant');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-const PORT = process.env.PORT || 4000;
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
@@ -22,13 +23,22 @@ app.get("/", (req, res) => {
   res.send("TastyThreads API is running...");
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-const authRoutes = require('./routes/auth');
+// Routes
 app.use('/api', authRoutes);
-
-
 app.use('/api/restaurants', restaurantRoutes);
+
+// ===== Replace .listen() with Lambda handler =====
+const server = awsServerlessExpress.createServer(app);
+
+if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  const server = awsServerlessExpress.createServer(app);
+  exports.handler = (event, context) => {
+    awsServerlessExpress.proxy(server, event, context);
+  };
+} else {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
