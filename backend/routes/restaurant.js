@@ -12,12 +12,11 @@ const {
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Restaurant CRUD
-router.post("/", addRestaurant);
 router.get("/", getRestaurants);
+router.post('/add-restaurant', upload.array('menuPhotos'), addRestaurant);
 router.get("/:id", getRestaurantById);
 
-// Thread routes
+
 router.get("/:id/threads", getThreads);
 router.post("/:id/threads", upload.single("image"), addThread);
 router.post("/:id/threads/:threadId/replies", addReply);

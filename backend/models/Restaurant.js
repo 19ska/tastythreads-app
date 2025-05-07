@@ -17,7 +17,7 @@ const ReplySchema = new mongoose.Schema({
     description: String,
   });
 
-const restaurantSchema = new mongoose.Schema({
+const RestaurantSchema = new mongoose.Schema({
     name: String,
     overview: String,
     menuPhotos: [String],
