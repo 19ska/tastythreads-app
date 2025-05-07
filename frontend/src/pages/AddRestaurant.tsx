@@ -79,11 +79,16 @@ const AddRestaurant = () => {
     });
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch("https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/add-restaurant", {
         method: "POST",
         body: formDataObj,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
+      console.log('add rest: ',response);
       if (response.ok) {
         navigate("/dashboard");
       } else {
