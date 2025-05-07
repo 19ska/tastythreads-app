@@ -9,19 +9,19 @@ type Restaurant = {
   name: string;
   menuPhotos: string[];
   overview: string;
-  // Add other fields if needed
 };
 
 const Dashboard = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [selectedTab, setSelectedTab] = useState("Recommended");
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/login");
       return;
@@ -49,16 +49,7 @@ const Dashboard = () => {
           localStorage.setItem("userLocation", JSON.stringify(loc));
           setUserLocation(loc);
           url += `?lat=${latitude}&lon=${longitude}`;
-
-          fetch(url)
-            .then((res) => res.json())
-            .then((data) => {
-              const validRestaurants = Array.isArray(data)
-                ? data.filter((r) => r._id && r.name)
-                : [];
-              setRestaurants(validRestaurants);
-            })
-            .catch((err) => console.error("Failed to fetch restaurants", err));
+          fetchRestaurants(url);
         },
         (error) => {
           console.error("Error getting user location:", error);
@@ -67,35 +58,38 @@ const Dashboard = () => {
       return;
     }
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        const validRestaurants = Array.isArray(data)
-          ? data.filter((r) => r._id && r.name)
-          : [];
-        setRestaurants(validRestaurants);
-      })
-      .catch((err) => console.error("Failed to fetch restaurants", err));
+    fetchRestaurants(url);
   }, [navigate]);
 
   useEffect(() => {
     let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
-  
     if (selectedTab === "Recommended" && userLocation) {
       url += `?lat=${userLocation.latitude}&lon=${userLocation.longitude}`;
     }
-  
+    fetchRestaurants(url);
+  }, [selectedTab, userLocation]);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredRestaurants(restaurants);
+    } else {
+      const filtered = restaurants.filter((r) =>
+        r.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredRestaurants(filtered);
+    }
+  }, [searchTerm, restaurants]);
+
+  const fetchRestaurants = (url: string) => {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        const validRestaurants = Array.isArray(data)
-          ? data.filter((r) => r._id && r.name)
-          : [];
-        setRestaurants(validRestaurants);
+        const valid = Array.isArray(data) ? data.filter((r) => r._id && r.name) : [];
+        setRestaurants(valid);
+        setFilteredRestaurants(valid); // initialize both
       })
       .catch((err) => console.error("Failed to fetch restaurants", err));
-  }, [selectedTab, userLocation]);
-  
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -108,7 +102,11 @@ const Dashboard = () => {
       <div className="top-bar">
         <span className="welcome-text">Welcome, {userEmail}</span>
         <button onClick={() => navigate("/add-restaurant")}>Add Restaurant</button>
-        <input placeholder="Search..." />
+        <input
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <button onClick={handleLogout}>Logout</button>
       </div>
 
@@ -116,12 +114,12 @@ const Dashboard = () => {
       <TabMenu selected={selectedTab} setSelected={setSelectedTab} />
 
       <div className="card-grid">
-        {restaurants.map((r) => (
+        {filteredRestaurants.map((r) => (
           <RestaurantCard
             key={r._id}
             _id={r._id}
             name={r.name}
-            image={r.menuPhotos && r.menuPhotos.length > 0 ? r.menuPhotos[0] : "/placeholder.jpg"}
+            image={r.menuPhotos?.[0] || "/placeholder.jpg"}
             description={r.overview || "No description available"}
           />
         ))}
