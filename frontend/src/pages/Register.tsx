@@ -50,7 +50,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/register", {
+      const res = await fetch("http://localhost:4000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
