@@ -52,7 +52,7 @@ const RestaurantDetails = () => {
 
   const fetchThreads = () => {
     if (!id) return;
-    fetch(`http://localhost:4000/api/restaurants/${id}/threads`)
+    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}/threads`)
       .then((res) => res.json())
       .then((data) => setThreads(data))
       .catch((err) => console.error("Failed to fetch threads:", err));
@@ -61,7 +61,7 @@ const RestaurantDetails = () => {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`http://localhost:4000/api/restaurants/${id}`)
+    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setRestaurant({ ...data, menu: data.menu || [], threads: data.threads || [] });
@@ -79,7 +79,7 @@ const RestaurantDetails = () => {
     formData.append("userId", userId);
     if (image) formData.append("image", image);
 
-    fetch(`http://localhost:4000/api/restaurants/${id}/threads`, {
+    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}/threads`, {
       method: "POST",
       body: formData,
     })
@@ -100,7 +100,7 @@ const RestaurantDetails = () => {
   const handleReply = (threadId: string, reply: string) => {
     if (!reply.trim() || !id) return;
 
-    fetch(`http://localhost:4000/api/restaurants/${id}/threads/${threadId}/replies`, {
+    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}/threads/${threadId}/replies`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reply, user: username, userId }),

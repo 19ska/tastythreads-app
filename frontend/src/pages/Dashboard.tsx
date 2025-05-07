@@ -35,7 +35,7 @@ const Dashboard = () => {
     }
 
     const savedLocation = localStorage.getItem("userLocation");
-    let url = "http://localhost:4000/api/restaurants";
+    let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
 
     if (savedLocation) {
       const parsed = JSON.parse(savedLocation);
@@ -79,7 +79,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    let url = "http://localhost:4000/api/restaurants";
+    let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
   
     if (selectedTab === "Recommended" && userLocation) {
       url += `?lat=${userLocation.latitude}&lon=${userLocation.longitude}`;

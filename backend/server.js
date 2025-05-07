@@ -29,16 +29,19 @@ app.use('/api/restaurants', restaurantRoutes);
 
 // ===== Replace .listen() with Lambda handler =====
 const server = awsServerlessExpress.createServer(app);
+exports.handler = (event, context) => {
+  awsServerlessExpress.proxy(server, event, context);
+};
 
-if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-  const server = awsServerlessExpress.createServer(app);
-  exports.handler = (event, context) => {
-    awsServerlessExpress.proxy(server, event, context);
-  };
-} else {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+// if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+//   const server = awsServerlessExpress.createServer(app);
+//   exports.handler = (event, context) => {
+//     awsServerlessExpress.proxy(server, event, context);
+//   };
+// } else {
+//   const PORT = process.env.PORT || 4000;
+//   app.listen(PORT, () => {
+//     console.log(`Server running on port ${PORT}`);
+//   });
+// }
 

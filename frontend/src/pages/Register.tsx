@@ -50,7 +50,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:4000/api/register", {
+      const res = await fetch("https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,18 +59,19 @@ const Register = () => {
       });
 
       const data = await res.json();
+      console.log("res data:", data);
 
-      if (res.ok) {
+      if (data.user) {
         localStorage.setItem("userId", data.user._id);
         localStorage.setItem("username", data.user.fullName);
-        alert("✅ Registration successful!");
-        navigate("/login"); // ✅ Redirect here
+        alert("Registration successful!");
+        navigate("/login"); // Redirect here
       } else {
-        alert(`❌ Registration failed: ${data.message || "Unknown error"}`);
+        alert(`Registration failed: ${data.message || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert("❌ Could not connect to server.");
+      alert("Could not connect to server.");
     }
   };
 

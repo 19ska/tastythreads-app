@@ -20,13 +20,14 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:4000/api/login", {
+      const res = await fetch("https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
+      console.log('resp:', data)
       if (res.ok) {
         setMessage("✅ Login successful!");
         localStorage.setItem("token", data.token);

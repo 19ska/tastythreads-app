@@ -15,7 +15,7 @@ const register = async (req, res) => {
     const user = new User({ fullName, email, phone, password: hashedPassword, location });
     await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: 'User registered successfully', user });
   } catch (err) {
     res.status(500).json({ message: 'Error registering user', error: err.message });
   }
@@ -34,7 +34,7 @@ const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        email: user.email // 🔥 include email in token payload
+        email: user.email // include email in token payload
       },
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
