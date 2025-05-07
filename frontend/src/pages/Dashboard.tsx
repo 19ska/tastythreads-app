@@ -9,6 +9,7 @@ type Restaurant = {
   name: string;
   menuPhotos: string[];
   overview: string;
+  
 };
 
 const Dashboard = () => {
@@ -35,7 +36,7 @@ const Dashboard = () => {
     }
 
     const savedLocation = localStorage.getItem("userLocation");
-    let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
+    let url = "http://localhost:4000/api/restaurants";
 
     if (savedLocation) {
       const parsed = JSON.parse(savedLocation);
@@ -62,9 +63,11 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
+    let url = "http://localhost:4000/api/restaurants";
     if (selectedTab === "Recommended" && userLocation) {
       url += `?lat=${userLocation.latitude}&lon=${userLocation.longitude}`;
+    } else if (selectedTab !== "Recommended") {
+      url += `?category=${selectedTab}`;
     }
     fetchRestaurants(url);
   }, [selectedTab, userLocation]);
@@ -121,6 +124,7 @@ const Dashboard = () => {
             name={r.name}
             image={r.menuPhotos?.[0] || "/placeholder.jpg"}
             description={r.overview || "No description available"}
+
           />
         ))}
       </div>

@@ -34,6 +34,8 @@ interface Restaurant {
   menuPhotos?: string[];
   menu?: MenuItem[];
   threads?: ThreadItem[];
+  lat?: string;
+  lon?: string;
 }
 
 const RestaurantDetails = () => {
@@ -52,7 +54,7 @@ const RestaurantDetails = () => {
 
   const fetchThreads = () => {
     if (!id) return;
-    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}/threads`)
+    fetch(`http://localhost:4000/api/restaurants/${id}/threads`)
       .then((res) => res.json())
       .then((data) => setThreads(data))
       .catch((err) => console.error("Failed to fetch threads:", err));
@@ -61,7 +63,7 @@ const RestaurantDetails = () => {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}`)
+    fetch(`http://localhost:4000/api/restaurants/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setRestaurant({ ...data, menu: data.menu || [], threads: data.threads || [] });
@@ -79,7 +81,7 @@ const RestaurantDetails = () => {
     formData.append("userId", userId);
     if (image) formData.append("image", image);
 
-    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}/threads`, {
+    fetch(`http://localhost:4000/api/restaurants/${id}/threads`, {
       method: "POST",
       body: formData,
     })
@@ -100,7 +102,7 @@ const RestaurantDetails = () => {
   const handleReply = (threadId: string, reply: string) => {
     if (!reply.trim() || !id) return;
 
-    fetch(`https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants/${id}/threads/${threadId}/replies`, {
+    fetch(`http://localhost:4000/api/restaurants/${id}/threads/${threadId}/replies`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reply, user: username, userId }),
@@ -128,6 +130,25 @@ const RestaurantDetails = () => {
           <p>{restaurant.overview}</p>
           <p><strong>Cuisine:</strong> {restaurant.cuisine}</p>
           <p><strong>Price Range:</strong> {restaurant.priceRange}</p>
+          {restaurant.lat && restaurant.lon && (
+             <button
+                onClick={() => {
+                  const url = `https://www.google.com/maps?q=${restaurant.lat},${restaurant.lon}`;
+                  window.open(url, "_blank");
+                }}
+                style={{
+                  marginTop: "10px",
+                  padding: "8px 16px",
+                  backgroundColor: "#3f51b5",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer"
+                }}
+              >
+                 Get Directions
+              </button>
+            )}
         </div>
   
         <div className="discussion">
