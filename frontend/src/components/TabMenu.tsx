@@ -1,6 +1,6 @@
 import "./TabMenu.css";
 
-const tabs = ["Recommended", "Lunch", "Dinner", "Snacks"];
+const tabs = ["Recommended", "All"];
 
 const TabMenu = ({ selected, setSelected }: any) => {
   return (

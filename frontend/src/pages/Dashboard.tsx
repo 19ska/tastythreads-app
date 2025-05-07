@@ -35,7 +35,7 @@ const Dashboard = () => {
     }
 
     const savedLocation = localStorage.getItem("userLocation");
-    let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
+    let url = "http://localhost:4000/api/restaurants";
 
     if (savedLocation) {
       const parsed = JSON.parse(savedLocation);
@@ -79,11 +79,12 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    let url = "https://89iavnnx4e.execute-api.us-west-1.amazonaws.com/dev/api/restaurants";
-    if (userLocation) {
+    let url = "http://localhost:4000/api/restaurants";
+  
+    if (selectedTab === "Recommended" && userLocation) {
       url += `?lat=${userLocation.latitude}&lon=${userLocation.longitude}`;
     }
-
+  
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -93,7 +94,8 @@ const Dashboard = () => {
         setRestaurants(validRestaurants);
       })
       .catch((err) => console.error("Failed to fetch restaurants", err));
-  }, [userLocation]);
+  }, [selectedTab, userLocation]);
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -111,7 +113,7 @@ const Dashboard = () => {
       </div>
 
       <h2>Browse restaurants</h2>
-      <TabMenu selected={selectedTab} setSelectedTab={setSelectedTab} />
+      <TabMenu selected={selectedTab} setSelected={setSelectedTab} />
 
       <div className="card-grid">
         {restaurants.map((r) => (
