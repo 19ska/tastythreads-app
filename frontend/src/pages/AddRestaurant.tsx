@@ -81,10 +81,7 @@ const AddRestaurant = () => {
     try {
       const response = await fetch("http://localhost:4000/api/restaurants/add-restaurant", {
         method: "POST",
-        body: formDataObj,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        body: formDataObj
       });
 
       console.log('add rest: ',response);
